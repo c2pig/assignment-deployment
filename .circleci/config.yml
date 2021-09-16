@@ -27,14 +27,17 @@ deploy-steps: &deploy-steps
   steps:
     - attach_workspace:
         at:  .
+    - setup_remote_docker
+    - run:
+        name: debug env variable
+        command: env
     - run:
         name: dockerize backend
-        command: |
-          echo "deploy backend package"
+        command: ./deployment/dockerize.sh
     - run:
         name: deploy frontend to s3 
         command: |
-          echo "deploy frontend to s3"
+          aws s3 sync public/ s3://${S3_BUCKET}/
     - run:
         command: ls -la
 
@@ -48,6 +51,8 @@ jobs:
     working_directory: ~/workdir
     docker:
       - image: mhart/alpine-node:1
+    environment:
+      S3_BUCKET: "demo.c2pig.com"
     <<: *deploy-steps
 
 workflows:
