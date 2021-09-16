@@ -1,0 +1,32 @@
+[
+  {
+    "name": "rate40",
+    "upper": 9999999999,
+    "lower": 180000,
+    "rate": 40
+  },
+  { 
+    "name": "rate30",
+    "upper": 180000,
+    "lower": 80000,
+    "rate": 30
+  },
+  { 
+    "name": "rate20",
+    "upper": 80000,
+    "lower": 40000,
+    "rate": 20
+  },
+  { 
+    "name": "rate10",
+    "upper": 40000,
+    "lower": 20000,
+    "rate": 10
+  },
+  {
+    "name": "rate0",
+    "upper": 20000,
+    "lower": 0,
+    "rate": 0
+  }
+]
