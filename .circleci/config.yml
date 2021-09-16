@@ -38,20 +38,20 @@ deploy-fe-steps: &deploy-fe-steps
           ls -la
           aws s3 sync public/ s3://${S3_BUCKET}/
 
-  deploy-service-steps: &deploy-service-steps
-    steps:
-      - checkout
-      - run:
-          name: "Deploy GKE cluster"
-          command: ./deployment/cluster/eks.sh
-      - run:
-          name: "Deploy Service"
-          command: |
-            ./deployment/kubernetes/deployment.yaml.sh
-            ./deployment/kubernetes/service.yaml.sh
-      - run:
-          name: "Deploy Ingress"
-          command: ./deployment/cluster/ingress.sh
+deploy-service-steps: &deploy-service-steps
+  steps:
+    - checkout
+    - run:
+        name: "Deploy GKE cluster"
+        command: ./deployment/cluster/eks.sh
+    - run:
+        name: "Deploy Service"
+        command: |
+          ./deployment/kubernetes/deployment.yaml.sh
+          ./deployment/kubernetes/service.yaml.sh
+    - run:
+        name: "Deploy Ingress"
+        command: ./deployment/cluster/ingress.sh
 
 jobs:
   build:
