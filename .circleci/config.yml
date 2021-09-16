@@ -25,6 +25,7 @@ build-steps: &build-steps
 
 deploy-steps: &deploy-steps
   steps:
+    - checkout
     - attach_workspace:
         at:  .
     - setup_remote_docker
@@ -53,6 +54,8 @@ jobs:
       - image: mhart/alpine-node:1
     environment:
       S3_BUCKET: "demo.c2pig.com"
+    context:
+      - credentials
     <<: *deploy-steps
 
 workflows:
