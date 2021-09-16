@@ -46,6 +46,7 @@ deploy-fe-steps: &deploy-fe-steps
           command: ./deployment/cluster/eks.sh
       - run:
           name: "Deploy Service"
+          command: |
             ./deployment/kubernetes/deployment.yaml.sh
             ./deployment/kubernetes/service.yaml.sh
       - run:
