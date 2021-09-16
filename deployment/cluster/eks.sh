@@ -28,6 +28,8 @@ EOF
 
 eksctl get cluster --name $CLUSTER_NAME -o json
 
+eksctl utils write-kubeconfig --cluster $CLUSTER_NAME
+
 [ $? -eq 0 ] && {
   echo "cluster exit, skip remaining steps"
   exit
