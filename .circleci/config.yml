@@ -83,7 +83,7 @@ workflows:
           workspace-root: workspace
           path: workspace
           repo: payroll-backend
-          tag: latest, ${CIRCLE_SHA1}
+          tag: latest,${CIRCLE_SHA1}
           requires:
             - build
       - deploy-fe:
