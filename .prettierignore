@@ -1,0 +1,7 @@
+*.js
+dist/
+.husky
+*.yml
+*.yaml
+*.md
+tsconfig.json

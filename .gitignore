@@ -1,0 +1,8 @@
+node_modules
+*.log
+dist/
+.serverless
+.db
+db/
+.cache
+public

@@ -1,0 +1,30 @@
+version: 2
+build-steps: &build-steps
+  steps:
+    - checkout
+    - restore_cache:
+        keys: 
+          - key-{{ checksum "yarn.lock" }}
+    - run:
+        name: install dependency
+        command: yarn
+    - save_cache:
+        key: key-{{ checksum "yarn.lock" }}
+        paths:
+          - node_modules/
+    - run:
+        name: test project setup
+        command: |
+          yarn help
+jobs:
+  build:
+    working_directory: ~/workdir
+    docker:
+      - image: mhart/alpine-node:16
+    <<: *build-steps
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - build
