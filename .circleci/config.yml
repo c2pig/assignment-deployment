@@ -42,7 +42,8 @@ deploy-steps: &deploy-steps
         name: deploy frontend to s3 
         command: |
           echo "deploy frontend to s3"
-          ls
+    - run:
+        command: ls -la
 
 jobs:
   build:
