@@ -80,7 +80,8 @@ workflows:
       - aws-ecr/build-and-push-image:
           context: credentials
           attach-workspace: true
-          workspace-root: project
+          # workspace-root: project
+          path: project
           repo: payroll-backend
           requires:
             - build
