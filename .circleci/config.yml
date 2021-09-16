@@ -58,13 +58,6 @@ jobs:
     docker:
       - image: mhart/alpine-node:16
     <<: *build-steps
-  deploy-be:
-    working_directory: ~/workdir
-    docker:
-      - image: docker:17.05.0-ce-git
-    context:
-      - credentials
-    <<: *deploy-be-steps
 
   deploy-fe:
     working_directory: ~/workdir
@@ -72,8 +65,6 @@ jobs:
       - image: amazon/aws-cli:2.2.26
     environment:
       S3_BUCKET: "demo.c2pig.com"
-    context:
-      - credentials
     <<: *deploy-fe-steps
 
 workflows:
@@ -85,17 +76,13 @@ workflows:
       - build:
           requires:
             - approval
-      - deploy-be:
-          requires:
-            - build
       - aws-ecr/build-and-push-image:
-          account-url: 198798184407.dkr.ecr.ap-southeast-1.amazonaws.com
           context: credentials
           attach-workspace: true
           repo: payroll-backend
           requires:
             - build
-
       - deploy-fe:
+          context: credentials
           requires:
             - build
