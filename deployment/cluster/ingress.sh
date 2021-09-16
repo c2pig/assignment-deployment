@@ -4,9 +4,7 @@ set -e
 set -o pipefail
 set -u 
 : "$SERVICE_DOMAIN"
-: "$SERVICE_NAME"
-
-ELB=$(kubectl get service ${SERVICE_NAME} -o json | jq -r '.status.loadBalancer.ingress[].hostname')
+: "$ELB_ADDRESS"
 
 cat << EOF > route53.yml
 AWSTemplateFormatVersion: "2010-09-09"

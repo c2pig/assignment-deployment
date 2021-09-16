@@ -49,6 +49,10 @@ deploy-service-steps: &deploy-service-steps
         command: |
           ./deployment/kubernetes/deployment.yaml.sh
           ./deployment/kubernetes/service.yaml.sh
+          ELB_ADDRESS=$(kubectl get service ${SERVICE_NAME} -o json | jq -r '.status.loadBalancer.ingress[].hostname')
+          echo "export ELB_ADDRESS=$ELB_ADDRESS" >> $BASH_ENV
+
+
 
 deploy-ingress-steps: &deploy-ingress-steps
   steps:
