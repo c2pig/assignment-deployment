@@ -1,5 +1,5 @@
 version: 2
-pre-build-steps: &pre-build-steps
+build-steps: &build-steps
   steps:
     - checkout
     - restore_cache:
@@ -12,13 +12,6 @@ pre-build-steps: &pre-build-steps
         key: key-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
         paths:
           - node_modules/
-
-build-steps: &build-steps
-  steps:
-    - checkout
-    - restore_cache:
-        keys: 
-          - key-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
     - run:
         name: build backend
         command: |
@@ -50,7 +43,6 @@ jobs:
     working_directory: ~/workdir
     docker:
       - image: mhart/alpine-node:16
-    <<: *pre-build-steps
     <<: *build-steps
   deploy:
     working_directory: ~/workdir
