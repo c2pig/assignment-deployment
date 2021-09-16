@@ -81,7 +81,7 @@ workflows:
           context: credentials
           attach-workspace: true
           # workspace-root: project
-          path: project
+          path: project/Dockerfile
           repo: payroll-backend
           requires:
             - build
