@@ -80,9 +80,10 @@ workflows:
       - aws-ecr/build-and-push-image:
           context: credentials
           attach-workspace: true
-          # workspace-root: project
-          path: project/Dockerfile
+          workspace-root: workspace
+          path: workspace
           repo: payroll-backend
+          tag: latest, ${CIRCLE_SHA1}
           requires:
             - build
       - deploy-fe:
