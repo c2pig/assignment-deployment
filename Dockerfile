@@ -6,4 +6,4 @@ WORKDIR /var/app/current
 
 COPY dist ./dist
 
-ENTRYPOINT pm2 start dist/src/main.js -i max && pm2 log --json
+ENTRYPOINT pm2 start dist/src/dev.js -i max && pm2 log --json

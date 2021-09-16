@@ -6,3 +6,4 @@ dist/
 db/
 .cache
 public
+cluster.yml

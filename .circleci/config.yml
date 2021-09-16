@@ -19,31 +19,12 @@ build-steps: &build-steps
         command: |
           yarn be:build
           yarn fe:build
-          ls dist/
     - persist_to_workspace:
         root: .
         paths:
           - public
           - dist
           - Dockerfile
-
-deploy-be-steps: &deploy-be-steps
-  steps:
-    - checkout
-    - attach_workspace:
-        at:  .
-    - setup_remote_docker
-    - run:
-        name: debug env variable
-        command: env
-    # - run:
-    #     name: dockerize backend
-    #     command: ./deployment/dockerize.sh
-    # - run:
-    #     name: deploy frontend to s3 
-    #     command: |
-    #       aws s3 sync public/ s3://${S3_BUCKET}/
-
 deploy-fe-steps: &deploy-fe-steps
   steps:
     - run:
@@ -56,6 +37,20 @@ deploy-fe-steps: &deploy-fe-steps
         command: |
           ls -la
           aws s3 sync public/ s3://${S3_BUCKET}/
+
+  deploy-service-steps: &deploy-service-steps
+    steps:
+      - checkout
+      - run:
+          name: "Deploy GKE cluster"
+          command: ./deployment/cluster/eks.sh
+      - run:
+          name: "Deploy Service"
+            ./deployment/kubernetes/deployment.yaml.sh
+            ./deployment/kubernetes/service.yaml.sh
+      - run:
+          name: "Deploy Ingress"
+          command: ./deployment/cluster/ingress.sh
 
 jobs:
   build:
@@ -71,6 +66,16 @@ jobs:
     environment:
       S3_BUCKET: "demo.c2pig.com"
     <<: *deploy-fe-steps
+
+  deploy-service:
+    working_directory: ~/workdir
+    docker:
+      - image: weaveworks/eksctl:0.66.0
+    <<: *deploy-service-steps
+    environment:
+      CLUSTER_NAME: "demo"
+      SERVICE_DOMAIN: "demo-api.c2pig.com"
+      SERVICE_NAME: "demo-backend"
 
 workflows:
   version: 2
@@ -91,6 +96,10 @@ workflows:
           requires:
             - build
       - deploy-fe:
+          context: credentials
+          requires:
+            - build
+      - deploy-service:
           context: credentials
           requires:
             - build
