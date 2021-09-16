@@ -1,30 +1,71 @@
 version: 2
+pre-build-steps: &pre-build-steps
+  steps:
+    - checkout
+    - restore_cache:
+        keys: 
+          - key-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+    - run:
+        name: install dependency
+        command: yarn
+    - save_cache:
+        key: key-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+        paths:
+          - node_modules/
+
 build-steps: &build-steps
   steps:
     - checkout
     - restore_cache:
         keys: 
-          - key-{{ checksum "yarn.lock" }}
+          - key-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
     - run:
-        name: install dependency
-        command: yarn
-    - save_cache:
-        key: key-{{ checksum "yarn.lock" }}
-        paths:
-          - node_modules/
-    - run:
-        name: test project setup
+        name: build backend
         command: |
-          yarn help
+          yarn be:build
+          yarn fe:build
+    - persist_to_workspace:
+        root: .
+        paths:
+          - public
+          - dist
+
+deploy-steps: &deploy-steps
+  steps:
+    - attach_workspace:
+        at:  .
+    - run:
+        name: dockerize backend
+        command: |
+          echo "deploy backend package"
+    - run:
+        name: deploy frontend to s3 
+        command: |
+          echo "deploy frontend to s3"
+          ls
+
 jobs:
   build:
     working_directory: ~/workdir
     docker:
       - image: mhart/alpine-node:16
+    <<: *pre-build-steps
     <<: *build-steps
+  deploy:
+    working_directory: ~/workdir
+    docker:
+      - image: mhart/alpine-node:1
+    <<: *deploy-steps
 
 workflows:
   version: 2
   ci:
     jobs:
-      - build
+      - approval:
+          type: approval
+      - build:
+          requires:
+            - approval
+      - deploy:
+          requires:
+            - build
