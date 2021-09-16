@@ -46,6 +46,9 @@ deploy-be-steps: &deploy-be-steps
 
 deploy-fe-steps: &deploy-fe-steps
   steps:
+    - run:
+        name: "install utility"
+        command: yum install tar gzip -y
     - attach_workspace:
         at:  .
     - run:
