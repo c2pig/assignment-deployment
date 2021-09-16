@@ -19,6 +19,7 @@ build-steps: &build-steps
         command: |
           yarn be:build
           yarn fe:build
+          ls dist/
     - persist_to_workspace:
         root: .
         paths:
@@ -79,6 +80,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           context: credentials
           attach-workspace: true
+          workspace-root: project
           repo: payroll-backend
           requires:
             - build
