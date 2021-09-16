@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@7.2.0
 build-steps: &build-steps
   steps:
     - checkout
@@ -23,7 +25,7 @@ build-steps: &build-steps
           - public
           - dist
 
-deploy-steps: &deploy-steps
+deploy-be-steps: &deploy-be-steps
   steps:
     - checkout
     - attach_workspace:
@@ -32,15 +34,23 @@ deploy-steps: &deploy-steps
     - run:
         name: debug env variable
         command: env
-    - run:
-        name: dockerize backend
-        command: ./deployment/dockerize.sh
+    # - run:
+    #     name: dockerize backend
+    #     command: ./deployment/dockerize.sh
+    # - run:
+    #     name: deploy frontend to s3 
+    #     command: |
+    #       aws s3 sync public/ s3://${S3_BUCKET}/
+
+deploy-fe-steps: &deploy-fe-steps
+  steps:
+    - attach_workspace:
+        at:  .
     - run:
         name: deploy frontend to s3 
         command: |
+          ls -la
           aws s3 sync public/ s3://${S3_BUCKET}/
-    - run:
-        command: ls -la
 
 jobs:
   build:
@@ -48,15 +58,23 @@ jobs:
     docker:
       - image: mhart/alpine-node:16
     <<: *build-steps
-  deploy:
+  deploy-be:
     working_directory: ~/workdir
     docker:
-      - image: mhart/alpine-node:1
+      - image: docker:17.05.0-ce-git
+    context:
+      - credentials
+    <<: *deploy-be-steps
+
+  deploy-fe:
+    working_directory: ~/workdir
+    docker:
+      - image: amazon/aws-cli:2.2.26
     environment:
       S3_BUCKET: "demo.c2pig.com"
     context:
       - credentials
-    <<: *deploy-steps
+    <<: *deploy-fe-steps
 
 workflows:
   version: 2
@@ -67,6 +85,17 @@ workflows:
       - build:
           requires:
             - approval
-      - deploy:
+      - deploy-be:
+          requires:
+            - build
+      - aws-ecr/build-and-push-image:
+          account-url: 198798184407.dkr.ecr.ap-southeast-1.amazonaws.com
+          context: credentials
+          attach-workspace: true
+          repo: payroll-backend
+          requires:
+            - build
+
+      - deploy-fe:
           requires:
             - build
