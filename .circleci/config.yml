@@ -25,6 +25,7 @@ build-steps: &build-steps
         paths:
           - public
           - dist
+          - Dockerfile
 
 deploy-be-steps: &deploy-be-steps
   steps:
