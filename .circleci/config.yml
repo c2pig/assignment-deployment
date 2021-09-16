@@ -49,6 +49,10 @@ deploy-service-steps: &deploy-service-steps
         command: |
           ./deployment/kubernetes/deployment.yaml.sh
           ./deployment/kubernetes/service.yaml.sh
+
+deploy-ingress-steps: &deploy-ingress-steps
+  steps:
+    - checkout
     - run:
         name: "Deploy Ingress"
         command: ./deployment/cluster/ingress.sh
@@ -75,8 +79,17 @@ jobs:
     <<: *deploy-service-steps
     environment:
       CLUSTER_NAME: "demo"
+      SERVICE_NAME: "demo-backend"
+
+  deploy-ingress:
+    working_directory: ~/workdir
+    docker:
+      - image: amazon/aws-cli:2.2.26
+    <<: *deploy-ingress-steps
+    environment:
       SERVICE_DOMAIN: "demo-api.c2pig.com"
       SERVICE_NAME: "demo-backend"
+
 
 workflows:
   version: 2
@@ -103,4 +116,9 @@ workflows:
       - deploy-service:
           context: credentials
           requires:
-            - build
+            - aws-ecr/build-and-push-image 
+      - deploy-ingress:
+          context: credentials
+          requires:
+            - deploy-service
+

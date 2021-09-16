@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -u 
 : "$SERVICE_NAME"
 
