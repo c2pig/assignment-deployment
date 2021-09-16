@@ -81,7 +81,6 @@ workflows:
           context: credentials
           attach-workspace: true
           workspace-root: workspace
-          path: workspace
           repo: payroll-backend
           tag: latest,${CIRCLE_SHA1}
           requires:
